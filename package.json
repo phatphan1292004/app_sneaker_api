@@ -1,10 +1,11 @@
 {
   "name": "app-sneaker-api",
   "version": "1.0.0",
-  "main": "src/server.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -20,6 +21,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^9.0.0",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
