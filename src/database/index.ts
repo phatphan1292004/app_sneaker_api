@@ -1,36 +1,31 @@
-import mongoose from 'mongoose';
+import { DataSource } from 'typeorm';
+import { Brand } from '../entities';
 
-const connectDB = async () => {
+export const AppDataSource = new DataSource({
+  type: 'mongodb',
+  url: process.env.MONGO_URI,
+  synchronize: true, // Set to false in production
+  logging: process.env.NODE_ENV === 'development',
+  entities: [Brand],
+});
+
+export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI!, {
-      serverSelectionTimeoutMS: 5000,
-    });
-
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📦 Database: ${conn.connection.name}`);
+    await AppDataSource.initialize();
+    console.log('✅ MongoDB Connected via TypeORM');
+    console.log(`📦 Database: ${AppDataSource.options.database || 'app-sneaker'}`);
   } catch (error: any) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
     process.exit(1);
   }
 };
 
-// Handle connection events
-mongoose.connection.on('connected', () => {
-  console.log('🔗 Mongoose connected to MongoDB');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error(`❌ Mongoose connection error: ${err}`);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('🔌 Mongoose disconnected from MongoDB');
-});
-
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  console.log('👋 Mongoose connection closed due to app termination');
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+    console.log('👋 TypeORM connection closed due to app termination');
+  }
   process.exit(0);
 });
 

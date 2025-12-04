@@ -1,2 +1,2 @@
 // Database entities/models
-export {};
+export { Brand } from './Brand';
