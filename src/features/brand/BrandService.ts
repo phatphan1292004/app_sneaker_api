@@ -1,32 +1,29 @@
-import { AppDataSource } from '../../database';
-import { Brand } from '../../entities';
+import { Brand } from "../../models";
 
 export class BrandService {
-  private brandRepository = AppDataSource.getMongoRepository(Brand);
-
   async getAllBrands() {
     try {
-      const brands = await this.brandRepository.find();
+      const brands = await Brand.find();
+      console.log("Brands found:", brands.length);
       return {
         success: true,
         data: brands,
         count: brands.length,
       };
     } catch (error: any) {
+      console.error("Error in getAllBrands:", error);
       throw new Error(`Error fetching brands: ${error.message}`);
     }
   }
 
   async getBrandById(id: string) {
     try {
-      const brand = await this.brandRepository.findOne({
-        where: { _id: id } as any,
-      });
+      const brand = await Brand.findById(id);
 
       if (!brand) {
         return {
           success: false,
-          message: 'Brand not found',
+          message: "Brand not found",
         };
       }
 
@@ -41,14 +38,12 @@ export class BrandService {
 
   async getBrandBySlug(slug: string) {
     try {
-      const brand = await this.brandRepository.findOne({
-        where: { slug } as any,
-      });
+      const brand = await Brand.findOne({ slug });
 
       if (!brand) {
         return {
           success: false,
-          message: 'Brand not found',
+          message: "Brand not found",
         };
       }
 
@@ -58,73 +53,6 @@ export class BrandService {
       };
     } catch (error: any) {
       throw new Error(`Error fetching brand: ${error.message}`);
-    }
-  }
-
-  async createBrand(brandData: Partial<Brand>) {
-    try {
-      const brand = this.brandRepository.create(brandData);
-      const savedBrand = await this.brandRepository.save(brand);
-
-      return {
-        success: true,
-        data: savedBrand,
-        message: 'Brand created successfully',
-      };
-    } catch (error: any) {
-      throw new Error(`Error creating brand: ${error.message}`);
-    }
-  }
-
-  async updateBrand(id: string, brandData: Partial<Brand>) {
-    try {
-      const brand = await this.brandRepository.findOne({
-        where: { _id: id } as any,
-      });
-
-      if (!brand) {
-        return {
-          success: false,
-          message: 'Brand not found',
-        };
-      }
-
-      await this.brandRepository.update(id, brandData);
-      const updatedBrand = await this.brandRepository.findOne({
-        where: { _id: id } as any,
-      });
-
-      return {
-        success: true,
-        data: updatedBrand,
-        message: 'Brand updated successfully',
-      };
-    } catch (error: any) {
-      throw new Error(`Error updating brand: ${error.message}`);
-    }
-  }
-
-  async deleteBrand(id: string) {
-    try {
-      const brand = await this.brandRepository.findOne({
-        where: { _id: id } as any,
-      });
-
-      if (!brand) {
-        return {
-          success: false,
-          message: 'Brand not found',
-        };
-      }
-
-      await this.brandRepository.delete(id);
-
-      return {
-        success: true,
-        message: 'Brand deleted successfully',
-      };
-    } catch (error: any) {
-      throw new Error(`Error deleting brand: ${error.message}`);
     }
   }
 }

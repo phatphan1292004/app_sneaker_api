@@ -5,7 +5,7 @@ const router = Router();
 const brandService = new BrandService();
 
 // GET all brands
-router.get('/brand', async (_req: Request, res: Response) => {
+router.get('/api/brand', async (_req: Request, res: Response) => {
   try {
     const result = await brandService.getAllBrands();
     return res.status(200).json(result);
