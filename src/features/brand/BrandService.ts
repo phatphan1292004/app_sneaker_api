@@ -4,7 +4,6 @@ export class BrandService {
   async getAllBrands() {
     try {
       const brands = await Brand.find();
-      console.log("Brands found:", brands.length);
       return {
         success: true,
         data: brands,

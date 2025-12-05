@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import connectDB from './database';
 import { BrandRoute } from './features/brand';
 import { ProductRoute } from './features/product';
+import { UserRoute } from './features/user';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(morgan('dev'));
 
 app.use(BrandRoute);
 app.use(ProductRoute);
+app.use(UserRoute);
 
 // Connect to MongoDB and start server
 connectDB()

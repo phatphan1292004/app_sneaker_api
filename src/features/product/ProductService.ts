@@ -52,9 +52,14 @@ export class ProductService {
     }
   }
 
-  async getProductsByCategory(category: string) {
+  // For You: Sản phẩm có lượt xem cao
+  async getForYouProducts(limit: number = 4) {
     try {
-      const products = await Product.find({ category }).populate('brand_id');
+      const products = await Product.find()
+        .populate('brand_id')
+        .select('name base_price images brand_id')
+        .sort({ views: -1 })
+        .limit(limit);
 
       return {
         success: true,
@@ -62,7 +67,45 @@ export class ProductService {
         count: products.length,
       };
     } catch (error: any) {
-      throw new Error(`Error fetching products by category: ${error.message}`);
+      throw new Error(`Error fetching for you products: ${error.message}`);
+    }
+  }
+
+  // Popular: Sản phẩm được yêu thích nhiều nhất
+  async getPopularProducts(limit: number = 4) {
+    try {
+      const products = await Product.find()
+        .populate('brand_id')
+        .select('name base_price images image brand_id')
+        .sort({ favorites: -1, sold: -1 })
+        .limit(limit);
+
+      return {
+        success: true,
+        data: products,
+        count: products.length,
+      };
+    } catch (error: any) {
+      throw new Error(`Error fetching popular products: ${error.message}`);
+    }
+  }
+
+  // Newest: Sản phẩm mới nhất
+  async getNewestProducts(limit: number = 4) {
+    try {
+      const products = await Product.find()
+        .populate('brand_id')
+        .select('name base_price images image brand_id')
+        .sort({ createdAt: -1 })
+        .limit(limit);
+
+      return {
+        success: true,
+        data: products,
+        count: products.length,
+      };
+    } catch (error: any) {
+      throw new Error(`Error fetching newest products: ${error.message}`);
     }
   }
 }

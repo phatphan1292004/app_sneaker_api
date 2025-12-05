@@ -36,7 +36,7 @@ router.get('/api/product/:id', async (req: Request, res: Response) => {
 });
 
 // GET products by brand
-router.get('/api/product/brand/:brandId', async (req: Request, res: Response) => {
+router.get('/product/brand/:brandId', async (req: Request, res: Response) => {
   try {
     const result = await productService.getProductsByBrand(req.params.brandId);
     return res.status(200).json(result);
@@ -48,10 +48,36 @@ router.get('/api/product/brand/:brandId', async (req: Request, res: Response) =>
   }
 });
 
-// GET products by category
-router.get('/api/product/category/:category', async (req: Request, res: Response) => {
+// GET For You products (4 sản phẩm có views cao nhất)
+router.get('/product/foryou', async (_req: Request, res: Response) => {
   try {
-    const result = await productService.getProductsByCategory(req.params.category);
+    const result = await productService.getForYouProducts(4);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// GET Popular products (4 sản phẩm được yêu thích nhất)
+router.get('/product/popular', async (_req: Request, res: Response) => {
+  try {
+    const result = await productService.getPopularProducts(4);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// GET Newest products (4 sản phẩm mới nhất)
+router.get('/product/newest', async (_req: Request, res: Response) => {
+  try {
+    const result = await productService.getNewestProducts(4);
     return res.status(200).json(result);
   } catch (error: any) {
     return res.status(500).json({
