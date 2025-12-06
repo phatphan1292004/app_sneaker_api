@@ -56,8 +56,17 @@ const ProductSchema: Schema = new Schema(
   },
   {
     timestamps: true,
-    collection: 'products', // Chỉ định đúng tên collection
+    collection: 'products',
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Virtual populate cho product_variants
+ProductSchema.virtual('variants', {
+  ref: 'ProductVariant',
+  localField: '_id',
+  foreignField: 'product_id',
+});
 
 export const Product = mongoose.model<IProduct>('Product', ProductSchema);

@@ -3,7 +3,8 @@ import { Product, Brand } from "../../models";
 export class ProductService {
   async getAllProducts() {
     try {
-      const products = await Product.find().populate('brand_id');
+      const products = await Product.find()
+        .populate('brand_id')
       
       return {
         success: true,
@@ -18,7 +19,9 @@ export class ProductService {
 
   async getProductById(id: string) {
     try {
-      const product = await Product.findById(id).populate('brand_id');
+      const product = await Product.findById(id)
+        .populate('brand_id')
+        .populate('variants');
 
       if (!product) {
         return {
@@ -38,7 +41,8 @@ export class ProductService {
 
   async getProductsByBrand(brandId: string) {
     try {
-      const products = await Product.find({ brand_id: brandId }).populate('brand_id');
+      const products = await Product.find({ brand_id: brandId })
+        .populate('brand_id')
       const brand = await Brand.findById(brandId);
 
       return {

@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import connectDB from './database';
 import { BrandRoute } from './features/brand';
+import { OrderRoute } from './features/order';
 import { ProductRoute } from './features/product';
 import { UserRoute } from './features/user';
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 app.use(BrandRoute);
+app.use(OrderRoute);
 app.use(ProductRoute);
 app.use(UserRoute);
 
