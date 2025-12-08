@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IProduct extends Document {
   brand_id: mongoose.Types.ObjectId;
@@ -10,6 +10,7 @@ export interface IProduct extends Document {
   sold: number;
   favorites: number;
   image: string;
+  discount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +19,7 @@ const ProductSchema: Schema = new Schema(
   {
     brand_id: {
       type: Schema.Types.ObjectId,
-      ref: 'Brand',
+      ref: "Brand",
       required: true,
     },
     name: {
@@ -53,20 +54,25 @@ const ProductSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    discount: {
+      type: Number,
+      default: 0, 
+    },
   },
   {
     timestamps: true,
-    collection: 'products',
+    collection: "products",
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
 
 // Virtual populate cho product_variants
-ProductSchema.virtual('variants', {
-  ref: 'ProductVariant',
-  localField: '_id',
-  foreignField: 'product_id',
+ProductSchema.virtual("variants", {
+  ref: "ProductVariant",
+  localField: "_id",
+  foreignField: "product_id",
 });
 
-export const Product = mongoose.model<IProduct>('Product', ProductSchema);
+
+export const Product = mongoose.model<IProduct>("Product", ProductSchema);

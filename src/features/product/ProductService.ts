@@ -5,6 +5,7 @@ export class ProductService {
     try {
       const products = await Product.find()
         .populate('brand_id')
+        .populate('variants');
       
       return {
         success: true,
@@ -43,6 +44,7 @@ export class ProductService {
     try {
       const products = await Product.find({ brand_id: brandId })
         .populate('brand_id')
+        .populate('variants');
       const brand = await Brand.findById(brandId);
 
       return {
@@ -61,7 +63,7 @@ export class ProductService {
     try {
       const products = await Product.find()
         .populate('brand_id')
-        .select('name base_price images brand_id')
+        .select('name base_price images brand_id discount')
         .sort({ views: -1 })
         .limit(limit);
 
@@ -80,7 +82,7 @@ export class ProductService {
     try {
       const products = await Product.find()
         .populate('brand_id')
-        .select('name base_price images image brand_id')
+        .select('name base_price images brand_id discount')
         .sort({ favorites: -1, sold: -1 })
         .limit(limit);
 
@@ -99,7 +101,7 @@ export class ProductService {
     try {
       const products = await Product.find()
         .populate('brand_id')
-        .select('name base_price images image brand_id')
+        .select('name base_price images brand_id discount')
         .sort({ createdAt: -1 })
         .limit(limit);
 
