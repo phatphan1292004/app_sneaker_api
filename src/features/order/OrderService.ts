@@ -8,7 +8,9 @@ export interface CreateOrderData {
   items: IOrderItem[];
   shipping_address: {
     street: string;
-    city: string;
+    province: string;
+    district: string;
+    ward: string;
     country: string;
   };
   payment_method: string;
@@ -106,7 +108,7 @@ export class OrderService {
       const orders = await Order.find({ user_id: userId })
         .populate({
           path: 'items.product_id',
-          select: 'name image',
+          select: 'name images description',
         })
         .populate({
           path: 'items.variant_id',

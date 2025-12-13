@@ -39,4 +39,21 @@ router.get('/order/user/:userId', async (req: Request, res: Response) => {
     });
   }
 });
+
+// Lấy chi tiết order theo orderId
+router.get('/order/:orderId', async (req: Request, res: Response) => {
+  try {
+    const result = await orderService.getOrderById(req.params.orderId);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 export default router;
