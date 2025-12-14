@@ -132,7 +132,7 @@ export class OrderService {
       const order = await Order.findById(orderId)
         .populate({
           path: 'items.product_id',
-          select: 'name image description',
+          select: 'name images description',
         })
         .populate({
           path: 'items.variant_id',
