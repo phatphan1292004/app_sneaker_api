@@ -9,6 +9,7 @@ import { OrderRoute } from './features/order';
 import { ProductRoute } from './features/product';
 import { UserRoute } from './features/user';
 import { AddressRoute } from './features/address';
+import { ReviewRoute } from './features/review';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(OrderRoute);
 app.use(ProductRoute);
 app.use(UserRoute);
 app.use(AddressRoute);
+app.use('/reviews', ReviewRoute);
 
 // Connect to MongoDB and start server
 connectDB()
