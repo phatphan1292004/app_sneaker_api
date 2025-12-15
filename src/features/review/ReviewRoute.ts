@@ -4,7 +4,7 @@ import ReviewService from './ReviewService';
 const router = Router();
 
 // Tạo bình luận mới (bình luận gốc hoặc reply)
-router.post('/', async (req, res) => {
+router.post('/reviews', async (req, res) => {
   try {
     const { product_id, user_id, content, rating, parent_id } = req.body;
     const review = await ReviewService.createReview({ product_id, user_id, content, rating, parent_id });
@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 });
 
 // Lấy tất cả bình luận của sản phẩm (dạng phẳng)
-router.get('/product/:product_id', async (req, res) => {
+router.get('/reviews/product/:product_id', async (req, res) => {
   try {
     const reviews = await ReviewService.getReviewsByProduct(req.params.product_id);
     res.json(reviews);

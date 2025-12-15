@@ -27,7 +27,7 @@ app.use(OrderRoute);
 app.use(ProductRoute);
 app.use(UserRoute);
 app.use(AddressRoute);
-app.use('/reviews', ReviewRoute);
+app.use( ReviewRoute);
 
 // Connect to MongoDB and start server
 connectDB()
