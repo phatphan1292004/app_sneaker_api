@@ -9,7 +9,7 @@ export interface IProduct extends Document {
   views: number;
   sold: number;
   favorites: number;
-  image: string;
+  images: string[];
   discount: number;
   createdAt: Date;
   updatedAt: Date;
@@ -50,8 +50,8 @@ const ProductSchema: Schema = new Schema(
       type: Number,
       default: 0,
     },
-    image: {
-      type: String,
+    images: {
+      type: [String],
       required: true,
     },
     discount: {
