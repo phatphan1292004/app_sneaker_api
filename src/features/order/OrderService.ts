@@ -1,7 +1,7 @@
-import { Order, IOrderItem } from '../../models/Order';
-import { Product } from '../../models/Product';
-import { ProductVariant } from '../../models/ProductVariant';
-import { User } from '../../models/User';
+import { Order, IOrderItem } from "../../models/Order";
+import { Product } from "../../models/Product";
+import { ProductVariant } from "../../models/ProductVariant";
+import { User } from "../../models/User";
 
 export interface CreateOrderData {
   user_id: string;
@@ -26,7 +26,7 @@ export class OrderService {
       if (!user) {
         return {
           success: false,
-          message: 'User not found',
+          message: "User not found",
         };
       }
 
@@ -75,21 +75,21 @@ export class OrderService {
       // Populate order details
       const populatedOrder = await Order.findById(order._id)
         .populate({
-          path: 'items.product_id',
-          select: 'name image',
+          path: "items.product_id",
+          select: "name image",
         })
         .populate({
-          path: 'items.variant_id',
-          select: 'color size price',
+          path: "items.variant_id",
+          select: "color size price",
         });
 
       return {
         success: true,
         data: populatedOrder,
-        message: 'Order created successfully',
+        message: "Order created successfully",
       };
     } catch (error: any) {
-      console.error('Error in createOrder:', error);
+      console.error("Error in createOrder:", error);
       throw new Error(`Error creating order: ${error.message}`);
     }
   }
@@ -101,18 +101,18 @@ export class OrderService {
       if (!user) {
         return {
           success: false,
-          message: 'User not found',
+          message: "User not found",
         };
       }
 
       const orders = await Order.find({ user_id: userId })
         .populate({
-          path: 'items.product_id',
-          select: 'name images description',
+          path: "items.product_id",
+          select: "name images description",
         })
         .populate({
-          path: 'items.variant_id',
-          select: 'color size price',
+          path: "items.variant_id",
+          select: "color size price",
         })
         .sort({ createdAt: -1 });
 
@@ -131,18 +131,18 @@ export class OrderService {
     try {
       const order = await Order.findById(orderId)
         .populate({
-          path: 'items.product_id',
-          select: 'name images description',
+          path: "items.product_id",
+          select: "name images description",
         })
         .populate({
-          path: 'items.variant_id',
-          select: 'color size price stock',
+          path: "items.variant_id",
+          select: "color size price stock",
         });
 
       if (!order) {
         return {
           success: false,
-          message: 'Order not found',
+          message: "Order not found",
         };
       }
 
@@ -152,6 +152,26 @@ export class OrderService {
       };
     } catch (error: any) {
       throw new Error(`Error fetching order: ${error.message}`);
+    }
+  }
+
+  async updateOrderStatus(
+    orderId: string,
+    status: "pending" | "paid" | "failed"
+  ) {
+    try {
+      const order = await Order.findByIdAndUpdate(
+        orderId,
+        { status },
+        { new: true }
+      );
+      if (!order) {
+        return { success: false, message: "Order not found" };
+      }
+      return { success: true, data: order };
+    } catch (error: any) {
+      console.error("updateOrderStatus error:", error);
+      return { success: false, message: error.message };
     }
   }
 }
