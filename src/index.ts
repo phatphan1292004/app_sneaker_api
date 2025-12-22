@@ -1,18 +1,22 @@
-import 'reflect-metadata';
-import express from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import connectDB from './database';
-import { BrandRoute } from './features/brand';
-import { OrderRoute } from './features/order';
-import { ProductRoute } from './features/product';
-import { UserRoute } from './features/user';
-import { AddressRoute } from './features/address';
-import { ReviewRoute } from './features/review';
+import "reflect-metadata";
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import connectDB from "./database";
+import { BrandRoute } from "./features/brand";
+import { OrderRoute } from "./features/order";
+import { ProductRoute } from "./features/product";
+import { UserRoute } from "./features/user";
+import { AddressRoute } from "./features/address";
+import { ReviewRoute } from "./features/review";
+import { VnpayRoute } from "./features/payment";
 
 dotenv.config();
-
+console.log("VNP_TMN_CODE:", process.env.VNP_TMN_CODE);
+console.log("VNP_HASH_SECRET:", process.env.VNP_HASH_SECRET);
+console.log("VNP_URL:", process.env.VNP_URL);
+console.log("VNP_RETURN_URL:", process.env.VNP_RETURN_URL);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -20,14 +24,15 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 app.use(BrandRoute);
+app.use(VnpayRoute);
 app.use(OrderRoute);
 app.use(ProductRoute);
 app.use(UserRoute);
 app.use(AddressRoute);
-app.use( ReviewRoute);
+app.use(ReviewRoute);
 
 // Connect to MongoDB and start server
 connectDB()
