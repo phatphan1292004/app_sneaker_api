@@ -1,11 +1,11 @@
-import { Router, Request, Response } from 'express';
-import { UserService } from './UserService';
+import { Router, Request, Response } from "express";
+import { UserService } from "./UserService";
 
 const router = Router();
 const userService = new UserService();
 
 // POST create new user
-router.post('/user', async (req: Request, res: Response) => {
+router.post("/user", async (req: Request, res: Response) => {
   try {
     const { firebaseUid, username, email, avatar, phoneNumber } = req.body;
 
@@ -26,7 +26,7 @@ router.post('/user', async (req: Request, res: Response) => {
     });
 
     if (!result.success) {
-      return res.status(409).json(result); 
+      return res.status(409).json(result);
     }
 
     return res.status(201).json(result);
@@ -38,9 +38,8 @@ router.post('/user', async (req: Request, res: Response) => {
   }
 });
 
-
 // GET user by ID
-router.get('/user/:id', async (req: Request, res: Response) => {
+router.get("/user/:id", async (req: Request, res: Response) => {
   try {
     const result = await userService.getUserById(req.params.id);
 
@@ -56,7 +55,5 @@ router.get('/user/:id', async (req: Request, res: Response) => {
     });
   }
 });
-
-
 
 export default router;

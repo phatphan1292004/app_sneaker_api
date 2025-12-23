@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   firebaseUid: string;
@@ -6,6 +6,8 @@ export interface IUser extends Document {
   email: string;
   avatar?: string;
   phoneNumber?: string;
+  birthDate?: string;
+  gender?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,11 +36,13 @@ const UserSchema: Schema = new Schema(
       type: String,
       required: false,
     },
+    birthDate: { type: String },
+    gender: { type: String },
   },
   {
     timestamps: true,
-    collection: 'users',
+    collection: "users",
   }
 );
 
-export const User = mongoose.model<IUser>('User', UserSchema);
+export const User = mongoose.model<IUser>("User", UserSchema);

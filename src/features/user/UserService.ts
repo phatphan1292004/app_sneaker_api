@@ -10,11 +10,8 @@ export class UserService {
   }) {
     try {
       // Kiểm tra xem user đã tồn tại chưa
-      const existingUser = await User.findOne({ 
-        $or: [
-          { firebaseUid: userData.firebaseUid },
-          { email: userData.email }
-        ]
+      const existingUser = await User.findOne({
+        $or: [{ firebaseUid: userData.firebaseUid }, { email: userData.email }],
       });
 
       if (existingUser) {
@@ -58,6 +55,4 @@ export class UserService {
       throw new Error(`Error fetching user: ${error.message}`);
     }
   }
-
-
 }
