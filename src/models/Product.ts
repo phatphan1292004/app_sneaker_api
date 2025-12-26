@@ -5,7 +5,6 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   base_price: number;
-  category: string;
   views: number;
   sold: number;
   favorites: number;
@@ -34,10 +33,6 @@ const ProductSchema: Schema = new Schema(
       type: Number,
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-    },
     views: {
       type: Number,
       default: 0,
@@ -56,7 +51,7 @@ const ProductSchema: Schema = new Schema(
     },
     discount: {
       type: Number,
-      default: 0, 
+      default: 0,
     },
   },
   {
@@ -74,5 +69,10 @@ ProductSchema.virtual("variants", {
   foreignField: "product_id",
 });
 
-
+ProductSchema.virtual("brand", {
+  ref: "Brand",
+  localField: "brand_id",
+  foreignField: "_id",
+  justOne: true,
+});
 export const Product = mongoose.model<IProduct>("Product", ProductSchema);
