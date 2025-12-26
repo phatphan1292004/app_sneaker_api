@@ -50,4 +50,17 @@ router.put("/profile/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.put("/profile/:id/avatar", async (req: Request, res: Response) => {
+  try {
+    const { avatar } = req.body;
+
+    const result = await profileService.updateAvatar(req.params.id, avatar);
+
+    if (!result.success) return res.status(404).json(result);
+    return res.json(result);
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 export default router;

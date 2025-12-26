@@ -58,4 +58,19 @@ export class ProfileService {
       data: user,
     };
   }
+
+  async updateAvatar(userId: string, avatar?: string) {
+    if (!avatar) {
+      return { success: false, message: "avatar is required" };
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { avatar } },
+      { new: true }
+    );
+
+    if (!user) return { success: false, message: "User not found" };
+    return { success: true, data: user };
+  }
 }

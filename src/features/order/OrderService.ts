@@ -2,6 +2,7 @@ import { Order, IOrderItem } from "../../models/Order";
 import { Product } from "../../models/Product";
 import { ProductVariant } from "../../models/ProductVariant";
 import { User } from "../../models/User";
+import mongoose from "mongoose";
 
 export interface CreateOrderData {
   user_id: string;
@@ -76,7 +77,7 @@ export class OrderService {
       const populatedOrder = await Order.findById(order._id)
         .populate({
           path: "items.product_id",
-          select: "name image",
+          select: "name image brand",
         })
         .populate({
           path: "items.variant_id",
@@ -157,7 +158,7 @@ export class OrderService {
 
   async updateOrderStatus(
     orderId: string,
-    status: "pending" | "paid" | "failed"
+    status: "pending" | "paid" | "failed" | "cancelled"
   ) {
     try {
       const order = await Order.findByIdAndUpdate(
@@ -171,6 +172,100 @@ export class OrderService {
       return { success: true, data: order };
     } catch (error: any) {
       console.error("updateOrderStatus error:", error);
+      return { success: false, message: error.message };
+    }
+  }
+
+  async cancelOrder(orderId: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const order = await Order.findById(orderId).session(session);
+
+      if (!order) {
+        await session.abortTransaction();
+        return { success: false, message: "Order not found" };
+      }
+
+      // chỉ cho hủy khi pending
+      if ((order.status || "").toLowerCase() !== "pending") {
+        await session.abortTransaction();
+        return {
+          success: false,
+          message: "Only pending orders can be cancelled",
+        };
+      }
+
+      // hoàn kho + trừ sold
+      for (const item of order.items) {
+        await ProductVariant.findByIdAndUpdate(
+          item.variant_id,
+          { $inc: { stock: item.quantity } },
+          { session }
+        );
+
+        // trừ sold (đảm bảo không âm)
+        const product = await Product.findById(item.product_id).session(
+          session
+        );
+        if (product) {
+          const newSold = Math.max(0, (product.sold || 0) - item.quantity);
+          product.sold = newSold;
+          await product.save({ session });
+        }
+      }
+
+      order.status = "cancelled";
+      await order.save({ session });
+
+      await session.commitTransaction();
+
+      return {
+        success: true,
+        message: "Order cancelled and stock restored",
+        data: order,
+      };
+    } catch (error: any) {
+      await session.abortTransaction();
+      console.error("cancelOrder error:", error);
+      return { success: false, message: error.message };
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async reorderFromOrder(orderId: string) {
+    try {
+      const oldOrder = await Order.findById(orderId);
+
+      if (!oldOrder) {
+        return { success: false, message: "Order not found" };
+      }
+
+      const st = (oldOrder.status || "").toLowerCase();
+
+      if (st !== "paid" && st !== "cancelled") {
+        return {
+          success: false,
+          message: "Only paid/cancelled orders can be reordered",
+        };
+      }
+      const items = oldOrder.items.map((it: any) => ({
+        product_id: String(it.product_id),
+        variant_id: String(it.variant_id),
+        quantity: it.quantity,
+      }));
+
+      return {
+        success: true,
+        message: "Reorder payload generated",
+        data: {
+          order_id: String(oldOrder._id),
+          items,
+        },
+      };
+    } catch (error: any) {
+      console.error("reorderFromOrder error:", error);
       return { success: false, message: error.message };
     }
   }
