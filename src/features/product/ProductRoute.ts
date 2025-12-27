@@ -87,4 +87,49 @@ router.get("/product/:id", async (req: Request, res: Response) => {
   }
 });
 
+// POST Toggle favorite (Thêm/xóa sản phẩm yêu thích)
+router.post("/product/favorite", async (req: Request, res: Response) => {
+  try {
+    const { firebaseUid, productId } = req.body;
+
+    if (!firebaseUid || !productId) {
+      return res.status(400).json({
+        success: false,
+        message: "firebaseUid and productId are required",
+      });
+    }
+
+    const result = await productService.toggleFavorite(firebaseUid, productId);
+
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// GET User favorites (Lấy danh sách sản phẩm yêu thích của user)
+router.get("/product/favorite/:firebaseUid", async (req: Request, res: Response) => {
+  try {
+    const result = await productService.getUserFavorites(req.params.firebaseUid);
+
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 export default router;

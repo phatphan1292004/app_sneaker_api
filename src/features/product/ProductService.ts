@@ -1,4 +1,4 @@
-import { Product, Brand } from "../../models";
+import { Product, Brand, User, Favorite } from "../../models";
 import mongoose from "mongoose";
 
 export class ProductService {
@@ -62,7 +62,7 @@ export class ProductService {
   }
 
   async getProductById(id: string) {
-    try {
+    try { 
       const product = await Product.findById(id)
         .populate("brand_id")
         .populate("variants");
@@ -155,6 +155,97 @@ export class ProductService {
       };
     } catch (error: any) {
       throw new Error(`Error fetching newest products: ${error.message}`);
+    }
+  }
+
+  // Toggle Favorite: Thêm/xóa sản phẩm vào danh sách yêu thích
+  async toggleFavorite(firebaseUid: string, productId: string) {
+    try {
+      const user = await User.findOne({ firebaseUid });
+      const product = await Product.findById(productId);
+
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      if (!product) {
+        return {
+          success: false,
+          message: "Product not found",
+        };
+      }
+
+      // Kiểm tra xem đã yêu thích chưa
+      const existingFavorite = await Favorite.findOne({
+        user_id: user._id,
+        product_id: productId,
+      });
+
+      if (existingFavorite) {
+        // Xóa khỏi danh sách yêu thích
+        await Favorite.deleteOne({ _id: existingFavorite._id });
+        product.favorites = Math.max(0, product.favorites - 1);
+        await product.save();
+
+        return {
+          success: true,
+          message: "Removed from favorites",
+          isFavorited: false,
+        };
+      } else {
+        // Thêm vào danh sách yêu thích
+        await Favorite.create({
+          user_id: user._id,
+          product_id: productId,
+        });
+        product.favorites += 1;
+        await product.save();
+
+        return {
+          success: true,
+          message: "Added to favorites",
+          isFavorited: true,
+        };
+      }
+    } catch (error: any) {
+      throw new Error(`Error toggling favorite: ${error.message}`);
+    }
+  }
+
+  // Get User Favorites: Lấy danh sách sản phẩm yêu thích của user
+  async getUserFavorites(firebaseUid: string) {
+    try {
+      const user = await User.findOne({ firebaseUid });
+
+      if (!user) {
+        return {
+          success: false,
+          message: "User not found",
+        };
+      }
+
+      const favorites = await Favorite.find({ user_id: user._id })
+        .populate({
+          path: "product_id",
+          populate: {
+            path: "brand_id",
+            model: "Brand",
+          },
+        })
+        .sort({ createdAt: -1 });
+
+      const products = favorites.map((fav) => fav.product_id);
+
+      return {
+        success: true,
+        data: products,
+        count: products.length,
+      };
+    } catch (error: any) {
+      throw new Error(`Error fetching user favorites: ${error.message}`);
     }
   }
 }

@@ -4,3 +4,4 @@ export { Product, IProduct } from './Product';
 export { ProductVariant, IProductVariant } from './ProductVariant';
 export { User, IUser } from './User';
 export { Address, IAddress } from './Address';
+export { Favorite, IFavorite } from './Favorite';
