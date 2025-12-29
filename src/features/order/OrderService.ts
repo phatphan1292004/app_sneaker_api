@@ -3,6 +3,7 @@ import { Product } from "../../models/Product";
 import { ProductVariant } from "../../models/ProductVariant";
 import { User } from "../../models/User";
 import mongoose from "mongoose";
+import { NotificationService } from "../notification/NotificationService";
 
 export interface CreateOrderData {
   user_id: string;
@@ -17,6 +18,8 @@ export interface CreateOrderData {
   payment_method: string;
   total_amount: number;
 }
+
+const notificationService = new NotificationService();
 
 export class OrderService {
   // Tạo order mới
@@ -60,6 +63,12 @@ export class OrderService {
 
       // Create order
       const order = await Order.create(orderData);
+
+      await notificationService.createByFirebaseUid(
+        orderData.user_id,
+        "Order placed successfully 🎉",
+        `Your order #${order._id} has been created.`
+      );
 
       // Update stock for each variant
       for (const item of orderData.items) {
@@ -169,6 +178,29 @@ export class OrderService {
       if (!order) {
         return { success: false, message: "Order not found" };
       }
+      let title = "Order update";
+      let message = `Your order #${order._id} status updated to ${status}`;
+
+      if (status === "paid") {
+        title = "Payment successful 💳";
+        message = `Your order #${order._id} has been paid successfully.`;
+      }
+
+      if (status === "failed") {
+        title = "Payment failed ❌";
+        message = `Payment failed for order #${order._id}.`;
+      }
+
+      if (status === "cancelled") {
+        title = "Order cancelled";
+        message = `Your order #${order._id} has been cancelled.`;
+      }
+
+      await notificationService.createByFirebaseUid(
+        String(order.user_id),
+        title,
+        message
+      );
       return { success: true, data: order };
     } catch (error: any) {
       console.error("updateOrderStatus error:", error);
@@ -220,6 +252,15 @@ export class OrderService {
 
       await session.commitTransaction();
 
+      const user = await User.findOne({ firebaseUid: order.user_id });
+
+      if (user) {
+        await notificationService.createByFirebaseUid(
+          String(order.user_id),
+          "Order cancelled",
+          `Your order #${order._id} has been cancelled successfully.`
+        );
+      }
       return {
         success: true,
         message: "Order cancelled and stock restored",
