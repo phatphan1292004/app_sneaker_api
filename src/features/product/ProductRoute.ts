@@ -69,6 +69,18 @@ router.get("/product/brand/:brandId", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/product/search", async (req: Request, res: Response) => {
+  try {
+    const result = await productService.searchProducts(req.query);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // GET product by id (phải đặt cuối cùng)
 router.get("/product/:id", async (req: Request, res: Response) => {
   try {
@@ -115,21 +127,26 @@ router.post("/product/favorite", async (req: Request, res: Response) => {
 });
 
 // GET User favorites (Lấy danh sách sản phẩm yêu thích của user)
-router.get("/product/favorite/:firebaseUid", async (req: Request, res: Response) => {
-  try {
-    const result = await productService.getUserFavorites(req.params.firebaseUid);
+router.get(
+  "/product/favorite/:firebaseUid",
+  async (req: Request, res: Response) => {
+    try {
+      const result = await productService.getUserFavorites(
+        req.params.firebaseUid
+      );
 
-    if (!result.success) {
-      return res.status(404).json(result);
+      if (!result.success) {
+        return res.status(404).json(result);
+      }
+
+      return res.status(200).json(result);
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+      });
     }
-
-    return res.status(200).json(result);
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
   }
-});
+);
 
 export default router;

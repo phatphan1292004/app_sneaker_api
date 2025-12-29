@@ -12,6 +12,7 @@ import { AddressRoute } from "./features/address";
 import { ReviewRoute } from "./features/review";
 import { VnpayRoute } from "./features/payment";
 import { ProfileRoute } from "./features/profile";
+import { NotificationRoute } from "./features/notification";
 
 dotenv.config();
 console.log("VNP_TMN_CODE:", process.env.VNP_TMN_CODE);
@@ -35,6 +36,7 @@ app.use(UserRoute);
 app.use(AddressRoute);
 app.use(ReviewRoute);
 app.use(ProfileRoute);
+app.use(NotificationRoute);
 
 // Connect to MongoDB and start server
 connectDB()

@@ -62,7 +62,7 @@ export class ProductService {
   }
 
   async getProductById(id: string) {
-    try { 
+    try {
       const product = await Product.findById(id)
         .populate("brand_id")
         .populate("variants");
@@ -247,5 +247,45 @@ export class ProductService {
     } catch (error: any) {
       throw new Error(`Error fetching user favorites: ${error.message}`);
     }
+  }
+
+  async searchProducts(query: any = {}) {
+    const q = String(query.q || "").trim();
+    const page = Math.max(1, parseInt(String(query.page || "1"), 10));
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(String(query.limit || "20"), 10))
+    );
+    const skip = (page - 1) * limit;
+
+    if (!q) {
+      return { success: true, data: [], count: 0, page, limit, total: 0 };
+    }
+
+    const filter = {
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const [items, total] = await Promise.all([
+      Product.find(filter)
+        .populate("brand_id")
+        .select("name base_price images brand_id discount createdAt")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments(filter),
+    ]);
+
+    return {
+      success: true,
+      data: items,
+      count: items.length,
+      total,
+      page,
+      limit,
+    };
   }
 }

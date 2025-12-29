@@ -75,4 +75,7 @@ ProductSchema.virtual("brand", {
   foreignField: "_id",
   justOne: true,
 });
+
+ProductSchema.index({ name: "text", description: "text" });
+
 export const Product = mongoose.model<IProduct>("Product", ProductSchema);
