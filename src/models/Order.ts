@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IOrderItem {
+  brand: string;
   product_id: mongoose.Types.ObjectId;
   variant_id: mongoose.Types.ObjectId;
   quantity: number;
@@ -27,6 +28,10 @@ export interface IOrder extends Document {
 }
 
 const OrderItemSchema = new Schema({
+  brand: {
+    type: String,
+  },
+
   product_id: {
     type: Schema.Types.ObjectId,
     ref: 'Product',
