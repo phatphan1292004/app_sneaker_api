@@ -36,10 +36,44 @@ export default class ReviewService {
   }
 
   static async getReviewsByProduct(product_id: string) {
-    // Lấy tất cả review của sản phẩm, sắp xếp theo thời gian tạo
-    return Review.find({ product_id: new Types.ObjectId(product_id) })
-      .sort({ createdAt: 1 })
-      .lean();
+    // Lấy tất cả review của sản phẩm kèm thông tin user (avatar và username)
+    return Review.aggregate([
+      {
+        $match: { product_id: new Types.ObjectId(product_id) }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user_id',
+          foreignField: 'firebaseUid',
+          as: 'user'
+        }
+      },
+      {
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          product_id: 1,
+          user_id: 1,
+          content: 1,
+          rating: 1,
+          parent_id: 1,
+          root_id: 1,
+          level: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'user.avatar': 1,
+          'user.username': 1
+        }
+      },
+      {
+        $sort: { createdAt: 1 }
+      }
+    ]);
   }
 
   static async getReviewThread(root_id: string) {
