@@ -1,1 +1,1 @@
-export { default as NotificationRoute } from "./notificationRoute";
+export { default as NotificationRoute } from "./NotificationRoute";
