@@ -310,4 +310,43 @@ export class OrderService {
       return { success: false, message: error.message };
     }
   }
+
+  async updateShippingAddress(
+    orderId: string,
+    address: {
+      street: string;
+      province: string;
+      district: string;
+      ward: string;
+      country: string;
+    }
+  ) {
+    try {
+      const order = await Order.findById(orderId);
+
+      if (!order) {
+        return { success: false, message: "Order not found" };
+      }
+
+      // Chỉ cho phép cập nhật địa chỉ khi đơn hàng đang ở trạng thái pending
+      if ((order.status || "").toLowerCase() !== "pending") {
+        return {
+          success: false,
+          message: "Can only update address for pending orders",
+        };
+      }
+
+      order.shipping_address = address;
+      await order.save();
+
+      return {
+        success: true,
+        message: "Shipping address updated successfully",
+        data: order,
+      };
+    } catch (error: any) {
+      console.error("updateShippingAddress error:", error);
+      return { success: false, message: error.message };
+    }
+  }
 }

@@ -78,4 +78,15 @@ router.post("/order/:orderId/reorder", async (req: Request, res: Response) => {
   }
 });
 
+// Cập nhật địa chỉ giao hàng
+router.put("/order/:orderId/shipping-address", async (req: Request, res: Response) => {
+  try {
+    const result = await orderService.updateShippingAddress(req.params.orderId, req.body);
+    if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 export default router;
