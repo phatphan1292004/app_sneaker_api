@@ -13,6 +13,12 @@ import { ReviewRoute } from "./features/review";
 import { VnpayRoute } from "./features/payment";
 import { ProfileRoute } from "./features/profile";
 import { NotificationRoute } from "./features/notification";
+import { AdminUsersRoute } from "./admin/users";
+import { AdminBrandsRoute } from "./admin/brands";
+import { AdminProductsRoute, AdminVariantsRoute } from "./admin/products";
+import { AdminOrdersRoute } from "./admin/orders";
+import { AdminVouchersRoute } from "./admin/vouchers";
+import { AdminDashboardRouter } from "./admin/homes";
 
 dotenv.config();
 console.log("VNP_TMN_CODE:", process.env.VNP_TMN_CODE);
@@ -37,7 +43,13 @@ app.use(AddressRoute);
 app.use(ReviewRoute);
 app.use(ProfileRoute);
 app.use(NotificationRoute);
-
+app.use(AdminUsersRoute);
+app.use(AdminBrandsRoute);
+app.use(AdminProductsRoute);
+app.use(AdminVariantsRoute);
+app.use(AdminOrdersRoute);
+app.use(AdminVouchersRoute);
+app.use(AdminDashboardRouter);
 // Connect to MongoDB and start server
 connectDB()
   .then(() => {

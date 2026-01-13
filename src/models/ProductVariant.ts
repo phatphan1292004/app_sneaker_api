@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IProductVariant extends Document {
   product_id: mongoose.Types.ObjectId;
@@ -14,7 +14,7 @@ const ProductVariantSchema: Schema = new Schema(
   {
     product_id: {
       type: Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: "Product",
       required: true,
     },
     color: {
@@ -37,8 +37,16 @@ const ProductVariantSchema: Schema = new Schema(
   },
   {
     timestamps: true,
-    collection: 'product_variants',
+    collection: "product_variants",
   }
 );
 
-export const ProductVariant = mongoose.model<IProductVariant>('ProductVariant', ProductVariantSchema);
+ProductVariantSchema.index(
+  { product_id: 1, color: 1, size: 1 },
+  { unique: true }
+);
+
+export const ProductVariant = mongoose.model<IProductVariant>(
+  "ProductVariant",
+  ProductVariantSchema
+);

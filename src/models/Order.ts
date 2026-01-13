@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IOrderItem {
   brand: string;
@@ -22,7 +22,7 @@ export interface IOrder extends Document {
   shipping_address: IShippingAddress;
   payment_method: string;
   total_amount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,12 +34,12 @@ const OrderItemSchema = new Schema({
 
   product_id: {
     type: Schema.Types.ObjectId,
-    ref: 'Product',
+    ref: "Product",
     required: true,
   },
   variant_id: {
     type: Schema.Types.ObjectId,
-    ref: 'ProductVariant',
+    ref: "ProductVariant",
     required: true,
   },
   quantity: {
@@ -87,7 +87,7 @@ const OrderSchema: Schema = new Schema(
       required: true,
       validate: {
         validator: (items: IOrderItem[]) => items.length > 0,
-        message: 'Order must have at least one item',
+        message: "Order must have at least one item",
       },
     },
     shipping_address: {
@@ -105,14 +105,21 @@ const OrderSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
-      default: 'pending',
+      enum: [
+        "pending",
+        "paid",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ],
+      default: "pending",
     },
   },
   {
     timestamps: true,
-    collection: 'orders',
+    collection: "orders",
   }
 );
 
-export const Order = mongoose.model<IOrder>('Order', OrderSchema);
+export const Order = mongoose.model<IOrder>("Order", OrderSchema);
