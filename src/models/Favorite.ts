@@ -4,7 +4,7 @@ export interface IFavorite extends Document {
   user_id: mongoose.Types.ObjectId;
   product_id: mongoose.Types.ObjectId;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt: Date;  
 }
 
 const FavoriteSchema: Schema = new Schema(
@@ -19,7 +19,7 @@ const FavoriteSchema: Schema = new Schema(
       required: true,
     },
   },
-  {
+  { 
     timestamps: true,
     collection: "favorites",
   }

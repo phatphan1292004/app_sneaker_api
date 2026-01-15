@@ -12,9 +12,9 @@ router.get(
       const result = await notificationService.getAll(req.params.firebaseUid);
       res.json(result);
     } catch (error: any) {
-      res.status(404).json({
-        success: false,
-        message: error.message,
+      res.json({
+        success: true,
+        data: [],
       });
     }
   }
