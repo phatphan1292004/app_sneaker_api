@@ -19,6 +19,7 @@ import { AdminProductsRoute, AdminVariantsRoute } from "./admin/products";
 import { AdminOrdersRoute } from "./admin/orders";
 import { AdminVouchersRoute } from "./admin/vouchers";
 import { AdminDashboardRouter } from "./admin/homes";
+import { VouchersRouter } from "./features/voucher";
 
 dotenv.config();
 console.log("VNP_TMN_CODE:", process.env.VNP_TMN_CODE);
@@ -50,6 +51,7 @@ app.use(AdminVariantsRoute);
 app.use(AdminOrdersRoute);
 app.use(AdminVouchersRoute);
 app.use(AdminDashboardRouter);
+app.use(VouchersRouter);
 // Connect to MongoDB and start server
 connectDB()
   .then(() => {

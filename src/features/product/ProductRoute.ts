@@ -81,24 +81,6 @@ router.get("/product/search", async (req: Request, res: Response) => {
   }
 });
 
-// GET product by id (phải đặt cuối cùng)
-router.get("/product/:id", async (req: Request, res: Response) => {
-  try {
-    const result = await productService.getProductById(req.params.id);
-
-    if (!result.success) {
-      return res.status(404).json(result);
-    }
-
-    return res.status(200).json(result);
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
 // POST Toggle favorite (Thêm/xóa sản phẩm yêu thích)
 router.post("/product/favorite", async (req: Request, res: Response) => {
   try {
@@ -132,7 +114,7 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const result = await productService.getUserFavorites(
-        req.params.firebaseUid
+        req.params.firebaseUid,
       );
 
       if (!result.success) {
@@ -146,7 +128,24 @@ router.get(
         error: error.message,
       });
     }
-  }
+  },
 );
 
+// GET product by id (phải đặt cuối cùng)
+router.get("/product/:id", async (req: Request, res: Response) => {
+  try {
+    const result = await productService.getProductById(req.params.id);
+
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 export default router;
