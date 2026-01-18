@@ -119,7 +119,7 @@ const OrderSchema: Schema = new Schema(
   {
     timestamps: true,
     collection: "orders",
-  }
+  },
 );
 
 export const Order = mongoose.model<IOrder>("Order", OrderSchema);

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { Order } from "../../models/Order"; // chỉnh path theo project bạn
+import { Order } from "../../models/Order";
+import { User } from "../../models";
 
 type SortDir = 1 | -1;
 
@@ -40,6 +41,7 @@ export class AdminOrdersService {
 
     const filter: any = {};
 
+    // filter status
     if (statusRaw !== "all") {
       if (!isOrderStatus(statusRaw)) {
         return { success: false, message: "Invalid status filter" };
@@ -47,10 +49,9 @@ export class AdminOrdersService {
       filter.status = statusRaw;
     }
 
+    // search q
     if (q) {
       const rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-      // search theo _id (partial) / user_id / payment_method
-      // _id trong mongo khó regex trực tiếp, nên dùng $expr + toString
       filter.$or = [
         { user_id: rx },
         { payment_method: rx },
@@ -60,14 +61,40 @@ export class AdminOrdersService {
 
     const sort = parseSort(opts.sort);
 
+    // ✅ lean() để items là plain object
     const [items, total] = await Promise.all([
-      Order.find(filter).sort(sort).skip(skip).limit(limit),
+      Order.find(filter).sort(sort).skip(skip).limit(limit).lean(),
       Order.countDocuments(filter),
     ]);
 
+    // ✅ lấy danh sách firebaseUid từ orders
+    const uids = Array.from(
+      new Set(
+        items.map((o: any) => String(o.user_id || "").trim()).filter(Boolean),
+      ),
+    );
+
+    // ✅ map firebaseUid -> username
+    const users = uids.length
+      ? await User.find({ firebaseUid: { $in: uids } })
+          .select("firebaseUid username")
+          .lean()
+      : [];
+
+    const uidToName = new Map<string, string>(
+      users.map((u: any) => [String(u.firebaseUid), String(u.username)]),
+    );
+
+    // ✅ trả về _id là string + user_name
+    const data = items.map((o: any) => ({
+      ...o,
+      _id: String(o._id), // 🔥 fix slice undefined
+      user_name: uidToName.get(String(o.user_id)) || String(o.user_id),
+    }));
+
     return {
       success: true,
-      data: items,
+      data,
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
     };
   }
@@ -76,7 +103,10 @@ export class AdminOrdersService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return { success: false, message: "Invalid order id" };
     }
-    const order = await Order.findById(id);
+    const order = await Order.findById(id)
+      .populate("items.product_id", "name images")
+      .populate("items.variant_id", "color size");
+
     if (!order) return { success: false, message: "Order not found" };
     return { success: true, data: order };
   }
@@ -89,7 +119,7 @@ export class AdminOrdersService {
       shipping_address: any;
       items: any[];
       total_amount: number;
-    }>
+    }>,
   ) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return { success: false, message: "Invalid order id" };
@@ -153,7 +183,7 @@ export class AdminOrdersService {
     const order = await Order.findByIdAndUpdate(
       id,
       { status },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!order) return { success: false, message: "Order not found" };
